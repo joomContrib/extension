@@ -1,4 +1,4 @@
-Extension package
+Extension package __Work in Progress__
 =================
 
 Unlike Joomla CMS, extensions are not resolved by location in filesystem, but by namespace.
@@ -12,7 +12,7 @@ Unlike Joomla CMS, extensions are not resolved by location in filesystem, but by
 Abstract extension class. Use it for custom extension types.
 
 
-_Available Methods_
+**Available Methods**
 
 - `getType`: Get extension type
 - `getName`: Get extension name
@@ -21,30 +21,32 @@ _Available Methods_
 - `getConfig`: Load extension configuration from database or json file.
 
 
-### ComponentExtension
+### AbstractComponent
 
-_Available methods_
+**Available methods**
 
 - `getTemplatePath` Template path, relative to extension directory
+- `getRoutes` Load component routes
 
-*Usage*
+**Usage**
 
-`Extension\[vendor]\FooComponent\FooComponent.php`
+Component code (`Extension\[vendor]\FooComponent\FooComponent.php`):
 
 ```PHP
 namespace Extension\[vendor]\FooComponent;
 
-use joomContrib\Extension\AbstractComponentExtension;
+use joomContrib\Extension\AbstractComponent;
 
-class FooComponent extends AbstractComponentExtension {}
+class FooComponent extends AbstractComponent {}
 ```
 
-`Extension\[vendor]\FooComponent\Controller\BarComponent.php`
+Controller code (`Extension\[vendor]\FooComponent\Controller\BarComponent.php`):
 
 ```PHP
 namespace Extension\[vendor]\FooComponent\Controller;
 
 use joomContrib\Extension\ExtensionManager;
+
 use Joomla\Controller\AbstractController;
 use Joomla\Input\Input;
 use Joomla\Application;
@@ -61,25 +63,29 @@ class BarController extends AbstractController
 	public function execute()
 	{
 		// Get parent extension
-		$extension = $this->extensionManager->getExtension($this);
-		$extension = $this->extensionManager->getExtension('microsoft\windowsComponent');
+		$extension = $this->extensionManager->getExtensionFor($this);
+		$extension = $this->extensionManager->getExtension('vendor\fooComponent');
 
 		// Get template file
-		$template = $extension->getTemplatePath() . '/' . 'bar.php';
+		$template = $extension->getTemplatePath() . '/' . 'bar.html.php';
 
 		// Return rendered template file
 		return include_once $template;
 	}
 }
-
 ```
 
 
-### PluginExtension
+### AbstractPlugin
 
+**Available methods**
+
+- `getEvents`: Get available events, optinally may define priorities
 
 
 ## ExtensionInstaller
+
+@TODO
 
 This is hooked up to Composers' [Library Installer](https://github.com/composer/composer/blob/master/src/Composer/Installer/LibraryInstaller.php).
 Provides installation/ update/ uninstallation methods, and triggers adequate events (ie. `onBeforeInstall` and `onAfterInstall`).
@@ -87,10 +93,14 @@ Provides installation/ update/ uninstallation methods, and triggers adequate eve
 
 ## ExtensionManager
 
+@TODO
+
 Container of all registered extensions
 
 
 ## ExtensionManager Service Provider
+
+@TODO
 
 Use it in your application.
 
@@ -102,15 +112,4 @@ $container = new Container;
 
 $container->registerServiceProvider(new ExtensionManagerServiceProvider(ExtensionManagerServiceProvider::DATABASE));
 
-
 ```
-
-
-
-Application runtime:
-
-1) Load extensions data (db/ file)
-2) Locate extension by routes
-3) 
-
-Maps extension names to extension namespaces.

@@ -49,7 +49,7 @@ abstract class AbstractComponent extends AbstractExtension
 	 *
 	 * @note    Check for template overwrites here?
 	 */
-	public function getTemplatePaths()
+	public function getTemplatePath()
 	{
 		if (!$this->templatePath)
 		{
