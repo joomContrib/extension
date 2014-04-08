@@ -1,0 +1,25 @@
+{
+	"name": "joomcontrib/extension",
+	"type": "joomla-package",
+	"description": "Extension Package",
+	"keywords": ["joomla","extension"],
+	"homepage": "https://github.com/joomContrib/Extension",
+	"license": "LGPL-2.1+",
+	"require": {
+		"php": ">=5.3.10",
+		"joomla/di": "~1.2",
+		"joomla/registry": "~1.1",
+		"joomla/event": "~1.1"
+	},
+	"require-dev": {
+	},
+	"suggest": {
+		"joomla/database": "Install to access Extensions data in database"
+	},
+	"autoload": {
+		"psr-4": {
+			"joomContrib\\Extension\\": "src/",
+			"joomContrib\\Extension\\Tests\\": "Tests/"
+		}
+	}
+}
