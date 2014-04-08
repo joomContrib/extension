@@ -1,0 +1,38 @@
+# Extension (package) entity schema
+
+joomContrib\Extension\ExtensionEntity;
+
+    type: entity
+    table: extension
+
+    id:
+        id:
+            type: integer
+            generator: { strategy: IDENTITY }
+
+## Similar as in joomla-distro
+    fields:
+        name:
+            type: string
+            length: 64
+        version:
+            type: string
+            length: 64
+        description:
+            type: text
+        type:
+            type: string
+            length: 32
+## Extra
+        namespace:
+            type: string
+            length: 64
+            comment: 'Extension namespace if available'
+        enabled:
+            type: boolean
+            comment: 'Enabled/ Disabled state'
+        config:
+            type: json_array
+            comment: 'Configuration'
+
+    lifecycleCallbacks: {  }

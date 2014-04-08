@@ -1,0 +1,33 @@
+# Route enity schema
+#
+# Reverse-engineered Joomla\Router\Router 2.0
+
+joomContrib\Extension\RouteEntity
+
+    type: entity
+    table: route
+
+    id:
+        id:
+            type: integer
+            generator: { strategy: IDENTITY }
+
+    fields:
+        # Pattern
+        pattern:
+            type: string
+            length: 128
+            unique: true
+        # Namespace to Controller@method
+        controller:
+            type: string
+            length: 128
+        # Defaults to []
+        rules:
+            type: array
+        # Defaults to GET
+        method:
+            type: string
+            length: 8
+
+    lifecycleCallbacks: {  }
