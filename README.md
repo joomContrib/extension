@@ -1,5 +1,7 @@
-Extension package __Work in Progress__
+Extension package
 =================
+
+_Work in Progress_
 
 Unlike Joomla CMS, extensions are not resolved by location in filesystem, but by namespace.
 
@@ -11,26 +13,32 @@ Unlike Joomla CMS, extensions are not resolved by location in filesystem, but by
 
 Abstract extension class. Use it for custom extension types.
 
+### Usage
 
-**Available Methods**
+#### The `getType` methhod
 
-- `getType`: Get extension type
-- `getName`: Get extension name
-- `getNamespace`: Get namespace
-- `getPath`: Get absolute directory path in filesystem
-- `getConfig`: Load extension configuration from database or json file.
+Get extension type
+
+#### The `getName` method
+
+Get extension name
+
+#### The `getNamespace` method
+Get namespace
+
+#### The `getPath` method
+
+Get absolute directory path in filesystem
+
+#### The `getConfig` method
+
+Load extension configuration from database or json file.
+
 
 
 ### AbstractComponent
 
-**Available methods**
-
-- `getTemplatePath` Template path, relative to extension directory
-- `getRoutes` Load component routes
-
-**Usage**
-
-Component code (`Extension\[vendor]\FooComponent\FooComponent.php`):
+Component code (_Extension\[vendor]\FooComponent\FooComponent.php_):
 
 ```PHP
 namespace Extension\[vendor]\FooComponent;
@@ -40,34 +48,27 @@ use joomContrib\Extension\AbstractComponent;
 class FooComponent extends AbstractComponent {}
 ```
 
-Controller code (`Extension\[vendor]\FooComponent\Controller\BarComponent.php`):
+Controller code (_Extension\[vendor]\FooComponent\Controller\BarComponent.php_):
 
 ```PHP
 namespace Extension\[vendor]\FooComponent\Controller;
 
-use joomContrib\Extension\ExtensionManager;
+use joomContrib\Extension\ExtensionContainer;
 
 use Joomla\Controller\AbstractController;
-use Joomla\Input\Input;
-use Joomla\Application;
+use Joomla\DI\ContainerAwareTrait;
 
-class BarController extends AbstractController
+class BarController extends AbstractController implements 
 {
-	public function __construct(Input $input = null, AbstractApplication $app = null, ExtensionManager $extensionManager = null)
-	{
-		parent::__construct($input, $app);
-
-		$this->extensionManager = $extensionManager;
-	}
+	use ContainerAwareTrait;
 
 	public function execute()
 	{
-		// Get parent extension
-		$extension = $this->extensionManager->getExtensionFor($this);
-		$extension = $this->extensionManager->getExtension('vendor\fooComponent');
+		// Get extension by alias
+		$fooComponent = $this->container->get('e/vendor/fooComponent');
 
 		// Get template file
-		$template = $extension->getTemplatePath() . '/' . 'bar.html.php';
+		$template = $fooComponent->getTemplatePath() . '/' . 'bar.html.php';
 
 		// Return rendered template file
 		return include_once $template;
@@ -76,11 +77,106 @@ class BarController extends AbstractController
 ```
 
 
+### Usage
+
+#### The `getTemplatePath` method
+
+Get absolute template path (relative to extension directory)
+
+#### The `getRoutes` method
+
+Get component routes
+
+
+#### Suggested file structure
+
+```
+Controller/
+    Sub/
+	    AlphaController.php
+        BetaController.php
+
+    DefaultController.php
+
+Entity/  <-- When using Doctrine\ORM
+     Sub.php
+
+Model/  <-- When using Joomla\Model
+    SubModel.php
+
+View/  <-- When using Joomla\View
+    SubHtmlView.php
+
+templates/
+    Sub/
+        alpha.view.twig
+        beta.view.twig
+    layout.html.twig
+
+install/
+    doctrine/
+        Sub.orm.yml
+    config.json
+    routes.json
+
+FooComponent.php  <-- Extension
+```
+
+
+
 ### AbstractPlugin
 
-**Available methods**
+### Usage
 
-- `getEvents`: Get available events, optinally may define priorities
+#### The `getEvents` method
+
+Get available events, optionally with defined priorities
+
+#### Suggested file structure
+
+```
+FooPlugin.php  <-- Extension
+```
+
+
+
+## Extension Service Provider
+
+### Usage
+
+```PHP
+use Joomla\DI\Container;
+use joomContrib\Extension\ExtensionServiceProvider;
+
+$container = new Container;
+
+$container->registerServiceProvider(new ExtensionServiceProvider());
+```
+
+#### The `__construct` method
+
+**Accepted Parameters**
+
+- `$options`: Sources to load extension data from:
+  sourceFile: location of json file
+  sourceTable: location of database table
+
+#### The `add` method
+
+- `$extension`: Extension instance to add
+
+#### The `filter` method
+
+@TODO
+
+#### The `byController` method
+
+Return extension of controller
+
+**Accepted Parameters**
+
+- `$controller`: Controller to resolve
+
 
 
 ## ExtensionInstaller
@@ -91,25 +187,12 @@ This is hooked up to Composers' [Library Installer](https://github.com/composer/
 Provides installation/ update/ uninstallation methods, and triggers adequate events (ie. `onBeforeInstall` and `onAfterInstall`).
 
 
-## ExtensionManager
 
-@TODO
+Disclamer
+---------
 
-Container of all registered extensions
+Concept borrowed from 
 
-
-## ExtensionManager Service Provider
-
-@TODO
-
-Use it in your application.
-
-```PHP
-use Joomla\DI\Container;
-use joomContrib\Extension\ExtensionManagerServiceProvider;
-
-$container = new Container;
-
-$container->registerServiceProvider(new ExtensionManagerServiceProvider(ExtensionManagerServiceProvider::DATABASE));
-
-```
+- [Symfony2](https://github.com/symfony/symfony/) (Bundles)
+- [Joomla CMS](github.com/joomla/joomla-cms/) (Extensions)
+- [Joomla-Distro proposal](github.com/joomla-distro/) (Installation)
