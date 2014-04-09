@@ -27,7 +27,7 @@ joomContrib\Extension\ExtensionEntity;
         namespace:
             type: string
             length: 64
-            comment: 'Extension namespace if available'
+            comment: 'Extension namespace'
         enabled:
             type: boolean
             comment: 'Enabled/ Disabled state'

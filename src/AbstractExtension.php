@@ -61,6 +61,23 @@ abstract class AbstractExtension implements ExtensionInterface
 	}
 
 	/**
+	 * Set extension data
+	 *
+	 * @param  array
+	 *
+	 * @return  $this
+	 */
+	public function setData(array $data = array())
+	{
+		foreach ($data as $key => $node)
+		{
+			$this->key = $node;
+		}
+
+		return $this;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function getType()
@@ -115,25 +132,16 @@ abstract class AbstractExtension implements ExtensionInterface
 	 *
 	 * @return  Joomla\Registry\Registry
 	 *
-	 * @todo  maybe nove part of ExtensionManager so it may be accessed using DI.
+	 * @todo  maybe nove part of ExtensionContainer so it may be accessed using DI.
 	 *        and config read from json file.
 	 */
 	public function getConfig()
 	{
-		return new Registry;
 
 		// LoadConfig
 		if (!$this->config)
 		{
-			$db = $this->getContainer()->get('Joomla\\Database\\DatabaseDriver');
-
-			$query = substr('SELECT e.* FROM #__extensions WHERE e.type = %s AND e.name = %s', $this->getType(), $this->getName());
-			$db->setQuery($query):
-
-			$extensionData = $db->loadObject();
-
-			// Load up non-scalar or json string
-			$this->config = new Registry($extensionData->config);
+			$this->config = new Registry;
 		}
 
 		return $this->config;
