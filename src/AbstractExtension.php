@@ -8,7 +8,7 @@
 
 namespace joomContrib\Extension;
 
-use joomContrib\ExtensionInterface;
+use joomContrib\Extension\ExtensionInterface;
 
 use Joomla\DI\Container;
 use Joomla\DI\ContainerAwareTrait;
@@ -63,9 +63,11 @@ abstract class AbstractExtension implements ExtensionInterface
 	/**
 	 * Set extension data
 	 *
-	 * @param  array
+	 * @param   array
 	 *
 	 * @return  $this
+	 *
+	 * @TODO  Reevaluate
 	 */
 	public function setData(array $data = array())
 	{

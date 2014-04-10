@@ -6,7 +6,7 @@
  * @license    GNU Lesser General Public License version 2 or later; see LICENSE.txt
  */
 
-namepspace joomContrb\Extension;
+namespace joomContrib\Extension;
 
 /**
  * Defines the interface for an Extension class.

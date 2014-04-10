@@ -6,7 +6,9 @@
  * @license    GNU Lesser General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace joomContrib\Extension
+namespace joomContrib\Extension;
+
+use Joomla\DI\Container;
 
 /**
  * Component base class
@@ -37,9 +39,9 @@ abstract class AbstractComponent extends AbstractExtension
 	/**
 	 * Constructor.
 	 */
-	public function __construct()
+	public function __construct(Container $container)
 	{
-		parent::__construct();
+		parent::__construct($container);
 	}
 
 	/**
