@@ -3,5 +3,4 @@ composer.phar
 composer.lock
 phpunit.xml
 
-src/extensions.json
 NOTES.md

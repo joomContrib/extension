@@ -3,15 +3,19 @@ Extension package
 
 _Work in Progress_
 
-Unlike Joomla CMS, extensions are not resolved by location in filesystem, but by namespace.
+What is Extension here? It's a package specific to the Application, so quite similar to Joomla CMS Extensions, Symfony2 Bundles or Wordpress Plugins.
 
-- How extensions communicate between each other? There must be global registry.
-- Installation scripts
+This packages is trying to assists in solving issues:
+
+- Moving some resources from Application to Extensions (like routes)
+- Provide helpers for extensions to communicate between each other
+- Extension Installation (todo)
+
 
 
 ## AbstractExtension
 
-Abstract extension class. Use it for custom extension types.
+Abstract extension class. Use it for developing custom extension types.
 
 ### Usage
 
@@ -21,8 +25,20 @@ Helper methods
 - `getName`
 - `getNamespace`
 - `getPath`: get absolute directory path in filesystem
-- `getConfig`
+- `getConfig`: retrieve configuration
 
+
+Composer setup 
+
+```JSON
+{
+	"autoload": {
+		"psr-4" : {
+			"Extension\\"			: "Extension//"
+		}
+	}
+}
+```
 
 
 ## AbstractComponent
@@ -56,7 +72,7 @@ class BarController extends AbstractController implements
 	public function execute()
 	{
 		// Get foreign extension by alias
-		$fooComponent = $this->getContainer()->get('e/vendor/fooComponent');
+		$fooComponent = $this->getContainer()->get('e/vendor/FooComponent');
 
 		// Get it's template file
 		$template = $fooComponent->getTemplatePath() . '/bar.html.php';
@@ -81,7 +97,7 @@ Get component routes
 
 #### Suggested file structure
 
-_Extensions/vendor/FooComponent_
+**Component folder** _Extensions/vendor/FooComponent/_
 
 ```
 Controller/
@@ -96,12 +112,15 @@ Model/  <-- When using Joomla/Model
 View/  <-- When using Joomla/View
     SubHtmlView.php
 templates/
-    Sub/
-        alpha.view.twig
-        beta.view.twig
+    alpha/
+        view.html.twig
+        edit.html.twig
+	beta/
+		view.xml.twig
+    default.html.twig
     layout.html.twig
-install/
-    doctrine/
+config/
+    doctrine/  <!-- When using Doctrine/ORM
         Sub.orm.yml
     config.json
     routes.json
@@ -114,6 +133,7 @@ FooComponent.php  <-- Extension
 
 ### Usage
 
+Plugin registration during application init
 ```PHP
 
 $dispatcher = $this->getDispatcher();
@@ -125,7 +145,7 @@ $plugins = $extensionServiceProvider->findBy(array('type' => 'Plugin'));
 // Register each plugin as event listener in dispatcher
 foreach ($plugins as $plugin)
 {
-	$dispatcher->addListerner($plugin, $plugin->getEvents);
+	$dispatcher->addListerner($plugin, $plugin->getEvents());
 }
 
 ```
@@ -136,19 +156,45 @@ Get available events, optionally with defined priorities
 
 #### Suggested file structure
 
-_Extensions/vendor/FooPlugin/_
+**Plugin folder** _Extensions/vendor/FooPlugin/_
 
 ```
 FooPlugin.php  <-- Extension
 ```
 
+**Plugin code**
+
+```PHP
+namespace Extension\vendor\FooPlugin;
+
+use joomContrib\Extension\AbstractPlugin;
+use Joomla\Event\Priority;
+
+class FooPlugin extends AbstractPlugin
+{
+	// Populate if want to specify priorities
+	private $events = array(
+		'onAfterExecute': Priority::LOW
+	);
+
+	public function onAfterExecute($event)
+	{
+		echo '!Hola Mundo!';
+	}
+}
+```
 
 
 ## Extension Service Provider
 
+Thanks to this fellow
+
+- you are able to access instance of every extension by defined alias. Instances are built once and only on demand.
+
 ### Usage
 
 **Register**
+
 ```PHP
 use Joomla\DI\Container;
 use joomContrib\Extension\ExtensionServiceProvider;
@@ -164,9 +210,10 @@ $container->registerServiceProvider(
 
 **Accepted Parameters**
 
-- `$options`: Sources to load extension data from:
-  sourceFile: location of json file
-  sourceTable: location of database table
+- `$options`:
+  - `sourceFile`: Location of .json file (ie. `$app_root . '/etc/extensions.json`).
+  - `sourceTable`: Name of database table (ie. `#__extensions`). The instance of _Joomla\Database\DatabaseDriver_ should be available in container.
+  - `aliasPrefix`: Container aliases prefix to `e/`.
 
 #### The `add` method
 
@@ -225,8 +272,8 @@ Provides installation/ update/ uninstallation methods, and triggers adequate eve
 Disclamer
 ---------
 
-Concept borrowed from 
+Concept base on
 
 - [Symfony2](https://github.com/symfony/symfony/) (Bundles)
-- [Joomla CMS](github.com/joomla/joomla-cms/) (Extensions)
-- [Joomla-Distro proposal](github.com/joomla-distro/) (Installation)
+- [Joomla CMS](https://github.com/joomla/joomla-cms/) (Extensions)
+- [Joomla-Distro proposal](https://github.com/joomla-distro/) by [Júlio Pontes](https://github.com/juliopontes) (Installation)

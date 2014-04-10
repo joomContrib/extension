@@ -89,7 +89,7 @@ abstract class AbstractExtension implements ExtensionInterface
 			// Split on camel case
 			$camel = preg_split('/(?=[A-Z])/', get_class($this), -1, PREG_SPLIT_NO_EMPTY);
 
-			// Set the last part
+			// Set the last hump
 			$this->type = array_pop($camel);
 		}
 	
@@ -107,7 +107,7 @@ abstract class AbstractExtension implements ExtensionInterface
 			$classArray = explode('\\', $this->getNamespace());
 			$vendorAndPackage = array_slice($classArray, -2);
 
-			$this->name = implode('\\', $vendorAndPackage);
+			$this->name = implode('/', $vendorAndPackage);
 		}
 
 		return $this->name;

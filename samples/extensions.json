@@ -1,0 +1,8 @@
+{
+	"vendor/FooComponent": {
+		"namespace": "\\Extension\\vendor\\FooComponent"
+	},
+	"vendor/BarComponent": {
+		"namespace": "\\Extension\\vendor\\BarComponent"
+	}
+}

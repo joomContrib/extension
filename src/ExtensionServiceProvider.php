@@ -28,7 +28,7 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 	protected $options = array(
 	//	'sourceFile' => 'extensions.json',
 	//	'sourceTable' => '#__extensions',
-		'aliasPrefix' => 'e/'
+		'aliasPrefix' => 'e/',
 	);
 
 	/**
@@ -114,7 +114,6 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 		}
 
 
-
 		// Provide access to own methods
 		$className = get_class($this);
 
@@ -125,7 +124,6 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 		return;
 	}
 
-	
 	/**
 	 * Load data
 	 *
@@ -148,7 +146,9 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 
 
 		// Load from database if needed
-		if (isset($this->options['sourceTable']) && $this->container->exists('Joomla\\Database\\DatabaseDriver'))
+		if (isset($this->options['sourceTable'])
+			&& $this->container->exists('Joomla\\Database\\DatabaseDriver')
+		)
 		{
 			$db = $this->container->get('Joomla\\Database\\DatabaseDriver');
 

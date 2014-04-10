@@ -24,7 +24,7 @@ interface ExtensionInterface
 
 	/**
 	 * Get extension name.
-	 * it consists of [vendor]/[packageName]
+	 * Consists of [vendor]/[packageName], just like in composer.json
 	 *
 	 * @return  string
 	 */
