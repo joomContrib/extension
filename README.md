@@ -29,7 +29,7 @@ Helper methods
 
 Base class for component extension
 
-**Component code** (_Extension\[vendor]\FooComponent\FooComponent.php_):
+**Component code** (_Extension/[vendor]/FooComponent/FooComponent.php_):
 
 ```PHP
 namespace Extension\[vendor]\FooComponent;
@@ -39,7 +39,7 @@ use joomContrib\Extension\AbstractComponent;
 class FooComponent extends AbstractComponent {}
 ```
 
-**Controller code** (_Extension\[vendor]\FooComponent\Controller\BarComponent.php_):
+**Controller code** (_Extension/[vendor]/FooComponent/Controller/BarComponent.php_):
 
 ```PHP
 namespace Extension\[vendor]\FooComponent\Controller;
@@ -56,7 +56,7 @@ class BarController extends AbstractController implements
 	public function execute()
 	{
 		// Get foreign extension by alias
-		$fooComponent = $this->container->get('e/vendor/fooComponent');
+		$fooComponent = $this->getContainer()->get('e/vendor/fooComponent');
 
 		// Get it's template file
 		$template = $fooComponent->getTemplatePath() . '/bar.html.php';
@@ -114,13 +114,29 @@ FooComponent.php  <-- Extension
 
 ### Usage
 
+```PHP
+
+$dispatcher = $this->getDispatcher();
+$extensionServiceProvider = $this->getContainer()->get('e/serviceProvider');
+
+// Get all registered plugins
+$plugins = $extensionServiceProvider->findBy(array('type' => 'Plugin'));
+
+// Register each plugin as event listener in dispatcher
+foreach ($plugins as $plugin)
+{
+	$dispatcher->addListerner($plugin, $plugin->getEvents);
+}
+
+```
+
 #### The `getEvents` method
 
 Get available events, optionally with defined priorities
 
 #### Suggested file structure
 
-_Extensions/vendor/FooPlugin_
+_Extensions/vendor/FooPlugin/_
 
 ```
 FooPlugin.php  <-- Extension
@@ -132,13 +148,16 @@ FooPlugin.php  <-- Extension
 
 ### Usage
 
+**Register**
 ```PHP
 use Joomla\DI\Container;
 use joomContrib\Extension\ExtensionServiceProvider;
 
 $container = new Container;
 
-$container->registerServiceProvider(new ExtensionServiceProvider());
+$container->registerServiceProvider(
+	new ExtensionServiceProvider(array(
+		'sourceFile' => APPLICATION_ROOT . '/app/config/extensons.json')));
 ```
 
 #### The `__construct` method
@@ -151,13 +170,28 @@ $container->registerServiceProvider(new ExtensionServiceProvider());
 
 #### The `add` method
 
+**Accepted parameters**
+
 - `$extension`: Extension instance to add
 
-#### The `filter` method
+#### The `findBy` method
 
-@TODO
+Lookup extensions matching criteria
 
-#### The `byController` method
+**Accepted Parameters**
+
+- `$criteria`: Criteria to match, ie, `array('type' => 'Plugin')`
+- `$asInscance`: Return instances (default) or FQCNs
+
+**Example**
+
+```PHP
+$extensionServiceProvider = $container->get('e/serviceProvider');
+
+$plugins = $extensionServiceProvider->findBy(array('type' => 'Plugin'));
+```
+
+#### The `findOneByController` method
 
 Return extension of controller
 
@@ -165,6 +199,18 @@ Return extension of controller
 
 - `$controller`: Controller to resolve
 
+**Example**
+
+```PHP
+class FooController
+{
+	public function execute()
+	{
+		$extensionServiceProvider = $this->getContainer()->get('e/serviceProvider');
+		$thisExtension = $extensionServiceProvider->findOneByController($this);
+	}
+}
+```
 
 
 ## ExtensionInstaller

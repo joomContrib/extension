@@ -6,6 +6,8 @@
  * @license    GNU Lesser General Public License version 2 or later; see https://www.gnu.org/licenses/lgpl.html
  */
 
+namespace joomContrib\Extension;
+
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Joomla\Registry\Registry;
@@ -23,9 +25,9 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 	 *
 	 * @var  array
 	 */
-	protected $config = array(
-		'sourceFile' => 'extensions.json',
-		'sourceTable' => '#__extensions',
+	protected $options = array(
+	//	'sourceFile' => 'extensions.json',
+	//	'sourceTable' => '#__extensions',
 		'aliasPrefix' => 'e/'
 	);
 
@@ -46,11 +48,11 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 	/**
 	 * Constructor.
 	 *
-	 * @param   array  $config  Service Configuration
+	 * @param   array  $options  Service Configuration
 	 */
-	public function __construct(array $config = array())
+	public function __construct(array $options = array())
 	{
-		$this->config = array_merge($this->config, $config);
+		$this->options = array_merge($this->options, $options);
 	}
 
 	/**
@@ -63,7 +65,7 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 		$aliasPrefix = $this->options['aliasPrefix'];
 
 		// Process each extension
-		foreach ($this->loadData($c) as $entry)
+		foreach ($this->loadData() as $alias => $entry)
 		{
 			$shortName = basename($entry->namespace);
 
@@ -90,24 +92,27 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 				$entry->fqcn,
 				function (Container $c) use ($entry)
 				{
-					static $instance;
+					// Build an object
+					$className = $entry->fqcn;
+					$instance = new $className($c);
+					
+					// Note: may be false if cannot resolve FQCN
+					// Fatal error: Maximum function nesting level of '100' reached, aborting!
+				//	$instance = $c->buildObject($entry->fqcn, true);
 
-					// Instantiate
-					if (!$instance)
-					{
-						$instance = $c->buildObject($entr->fqcn, true);
+					// Set data (config, routes or anything else)
+					$instance->setData((array) $entry);
 
-						// Set data (config, routes or anything else)
-						$instance->setData($entry);
-					}
 
 					return $instance;
 				},
 				true
 			);
 
-			$container->alias($aliasPrefix . $entry->alias, $fqcn);
+
+			$container->alias($aliasPrefix . $alias, $entry->fqcn);
 		}
+
 
 
 		// Provide access to own methods
@@ -120,79 +125,7 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 		return;
 	}
 
-	/**
-	 * Get list of extensions filtered by single criteria
-	 *
-	 * @param   string   $by      Criteria
-	 * @param   boolean  $asKeys  Get keys or instances
-	 *
-	 * @return  array
-	 */
-	public function filter($by = 'type', $value, $asKeys = false)
-	{
-		$results = array();
-
-		// Looup
-		foreach ($this->dataStore as $node)
-		{
-			if (isset($node->{$by} && $node->{$by} == $value)
-			{
-				$results[] = ($asKeys)
-					? $node->fqcn
-					: $this->container->get($fqcn);
-			}
-		}
-
-
-		return $results;
-	}
-
-	/**
-	 * Set extenion in container
-	 *
-	 * @param   instaceof ExtensionInterface  $extension
-	 *
-	 * @return  $this
-	 */
-	public function add(ExtensionInterface $extension)
-	{
-		$fqcn = get_class($extension)
-
-		// Share object
-		$this->container->share(
-			get_class($extension),
-			$extension,
-			true
-		);
-
-		// Set alias
-		$this->container->alias($extension->getName(), $extension);
-
-		return $this;
-	}
-
-	/**
-	 * Get Extension by controller
-	 *
-	 * @param   instanceof ControllerInterface  $controller
-	 *
-	 * @return  instanceof Extension
-	 */
-	public function byController(ControllerInterface $controller)
-	{
-		// Lookup namespaces
-		$namespaceAndController = explode('\\Controller\\', get_class($controller));
-
-		// Use two last parts of a namespace
-		$nsArray = explode('\\', $namespaceAndController);
-
-		$namespace = implode('\\', array_slice($nsArray, -2));
-		$fqcn = $namespace . '\\' . basename($namespace);
-
-
-		return $this->container->get($fqcn);
-	}
-
+	
 	/**
 	 * Load data
 	 *
@@ -210,12 +143,12 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 		)
 		{
 			// Load results
-			$results += (new Registry($this->options['sourceFile'])->asArray();
+			$results += (array) json_decode(file_get_contents($this->options['sourceFile']));
 		}
 
 
 		// Load from database if needed
-		if (isset($this->options['sourceTable']))
+		if (isset($this->options['sourceTable']) && $this->container->exists('Joomla\\Database\\DatabaseDriver'))
 		{
 			$db = $this->container->get('Joomla\\Database\\DatabaseDriver');
 
@@ -228,5 +161,88 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 
 
 		return $results;
+	}
+
+	/**
+	 * Set extenion in container
+	 *
+	 * @param   instaceof ExtensionInterface  $extension
+	 *
+	 * @return  $this
+	 */
+	public function add(ExtensionInterface $extension)
+	{
+		$fqcn = get_class($extension);
+
+		// Share object
+		$this->container->share(
+			$fqcn,
+			$extension,
+			true
+		);
+
+		// Set alias
+		$this->container->alias($this->options['aliasPrefix'] . $extension->getName(), $fqcn);
+
+		return $this;
+	}
+
+	/**
+	 * Find extension by key, without using alias prefix
+	 *
+	 * @param   $key
+	 *
+	 * @return  instaceof ExtensionInterface
+	 */
+	public function findOneByAlias($key)
+	{
+		return $this->container->get($this->options['aliasPrefix'] . $key);
+	}
+
+	/**
+	 * Get list of extensions matching criteria
+	 *
+	 * @param   array    $criteria  Criteria to match, ie, array('type' => 'Plugin')
+	 *                              Available options are: type, namespace, fqcn
+	 * @param   boolean  $instance  Get FQCNs or instances
+	 *
+	 * @return  array
+	 */
+	public function findBy(array $criteria = array(), $asInstance = true)
+	{
+		$results = array();
+
+		// Looup
+		foreach ($this->dataStore as $fqcn => $node)
+		{
+			$intersection = array_intersect_assoc((array) $node, $criteria);
+
+			if (!empty($intersection))
+			{
+				$results[] = ($asInstance) ? $this->container->get($fqcn) : $fqcn;
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Get Extension by controller
+	 *
+	 * @param   instanceof ControllerInterface  $controller
+	 *
+	 * @return  instanceof Extension
+	 *
+	 * @thorws  InvalidArgumentException  Key has not been registered with the container
+	 */
+	public function findOneByController(ControllerInterface $controller)
+	{
+		// Extract extension namespace
+		list($namespace, $controllerPath) = explode('\\Controller\\', get_class($controller));
+
+		// Build FQCN
+		$fqcn = '\\' . $namespace . '\\' . basename($namespace);
+
+		return $this->container->get($fqcn);
 	}
 }
