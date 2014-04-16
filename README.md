@@ -118,9 +118,9 @@ templates/
 	beta/
 		view.xml.twig
     default.html.twig
-    layout.html.twig
+    layout.html.twig  <-- Only when component renders whole page
 config/
-    doctrine/  <!-- When using Doctrine/ORM
+    doctrine/  <-- When using Doctrine/ORM
         Sub.orm.yml
     config.json
     routes.json

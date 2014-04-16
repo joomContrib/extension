@@ -27,7 +27,7 @@ abstract class AbstractComponent extends AbstractExtension
 	 *
 	 * @param  string
 	 */
-	protected $temlatePath;
+	protected $templatePath;
 
 	/**
 	 * Routes
