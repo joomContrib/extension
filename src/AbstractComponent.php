@@ -55,7 +55,7 @@ abstract class AbstractComponent extends AbstractExtension
 	{
 		if (!$this->templatePath)
 		{
-			$this->templatePath = $this->getPath() . '/templates';
+			$this->templatePath = $this->getPath('templates');
 		}
 
 		return $this->templatePath;

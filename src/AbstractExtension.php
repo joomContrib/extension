@@ -116,17 +116,21 @@ abstract class AbstractExtension implements ExtensionInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getNamespace()
+	public function getNamespace($sub = null)
 	{
-		return $this->reflected->getNamespaceName();
+		$namespace = $this->reflected->getNamespaceName();
+
+		return ($sub) ? $namespace . '\\' . $sub : $namespace;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getPath()
+	public function getPath($sub = null)
 	{
-		return dirname($this->reflected->getFileName());
+		$path = dirname($this->reflected->getFileName());
+
+		return ($sub) ? $path . '/' . $sub : $path;
 	}
 
 	/**

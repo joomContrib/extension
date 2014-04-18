@@ -33,16 +33,20 @@ interface ExtensionInterface
 	/**
 	 * Get the Extension namespace.
 	 *
+	 * @param   string  $sub  Sub namespace
+	 *
 	 * @return  string
 	 */
-	public function getNamespace();
+	public function getNamespace($sub = null);
 
 	/**
 	 * Get the Extension directory path.
 	 *
+	 * @param   string  $sub  Sub path
+	 *
 	 * @return  string  @return  string  The extension absolute path
 	 */
-	public function getPath();
+	public function getPath($sub = null);
 
 	/**
 	 * Get extension configuration

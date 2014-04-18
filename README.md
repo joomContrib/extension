@@ -19,16 +19,45 @@ Abstract extension class. Use it for developing custom extension types.
 
 ### Usage
 
-Helper methods
 
-- `getType`
-- `getName`
-- `getNamespace`
-- `getPath`: get absolute directory path in filesystem
-- `getConfig`: retrieve configuration
+#### The `getType` method
+
+Retrieve extension type
 
 
-Composer setup 
+#### The `getName` method
+
+Retrieve extension name
+
+
+#### The `getNamespace` method
+
+Retrieve extension namespace
+
+**Accepted Parameters**
+
+- `$sub`: Sub namespace
+
+Example: `$profileEntity = $extension->getNamespace('Entity\\Profile');`
+
+
+#### The `getPath` method
+
+Get absolute directory path in the filesystem
+
+**Accepted Parameters**
+
+- `$sub`: Sub path
+
+Example: `$template = $extension->getPath('profile/view.html.twig');`
+
+
+#### The `getConfig` method
+
+Retrieve configuration
+
+
+#### Composer setup
 
 ```JSON
 {
