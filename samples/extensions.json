@@ -1,6 +1,12 @@
 {
 	"vendor/FooComponent": {
-		"namespace": "\\Extension\\vendor\\FooComponent"
+		"namespace": "\\Extension\\vendor\\FooComponent",
+		"type": "component",
+		"enabled": true,
+		"config": {
+		},
+		"routes": {
+		}
 	},
 	"vendor/BarComponent": {
 		"namespace": "\\Extension\\vendor\\BarComponent"
