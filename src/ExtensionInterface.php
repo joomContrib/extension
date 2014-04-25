@@ -31,22 +31,29 @@ interface ExtensionInterface
 	public function getName();
 
 	/**
-	 * Get the Extension namespace.
-	 *
-	 * @param   string  $sub  Sub namespace
+	 * Get Extension namespace.
 	 *
 	 * @return  string
 	 */
-	public function getNamespace($sub = null);
+	public function getNamespace();
+
+	/**
+	 * Get Extension class
+	 *
+	 * @param   string  $nested  Nested class
+	 *
+	 * @return  string
+	 */
+	public function getClass($nested = null);
 
 	/**
 	 * Get the Extension directory path.
 	 *
-	 * @param   string  $sub  Sub path
+	 * @param   string  $nested  Nested path
 	 *
 	 * @return  string  @return  string  The extension absolute path
 	 */
-	public function getPath($sub = null);
+	public function getPath($nested = null);
 
 	/**
 	 * Get extension configuration

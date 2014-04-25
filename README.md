@@ -34,11 +34,17 @@ Retrieve extension name
 
 Retrieve extension namespace
 
+
+#### The `getClass` method
+
+
+Retrieve extension class
+
 **Accepted Parameters**
 
-- `$sub`: Sub namespace
+- `$nested`: Nested namespace
 
-Example: `$profileEntity = $extension->getNamespace('Entity\\Profile');`
+Example: `$profileModel = $extension->getClass('Model\\Profile');`
 
 
 #### The `getPath` method
@@ -47,7 +53,7 @@ Get absolute directory path in the filesystem
 
 **Accepted Parameters**
 
-- `$sub`: Sub path
+- `$Nub`: Nested path
 
 Example: `$template = $extension->getPath('profile/view.html.twig');`
 
@@ -55,6 +61,26 @@ Example: `$template = $extension->getPath('profile/view.html.twig');`
 #### The `getConfig` method
 
 Retrieve configuration
+
+
+#### Registering extension service provider
+
+Register extension service provider, located in `Providers` subdirectory.
+
+```php
+use joomContrib\Extension\AbstractPlugin;
+use Joomla\DI\Container;
+
+class MyPlugin extends AbstrctPlugin
+{
+	public function __construct(Container $container)
+	{
+		parent::__construct($container);
+
+		$container->registerServiceProvider($this->getClass('Providers\MyServiceProvider'));
+	}
+}
+```
 
 
 #### Composer setup
@@ -130,23 +156,24 @@ Get component routes
 
 ```
 Controller/
-    Sub/
-	    AlphaController.php
-        BetaController.php
-    DefaultController.php
+    Item/
+	    ViewController.php
+        EditController.php
+    ViewController.php
 Entity/  <-- When using Doctrine/ORM
-     Sub.php
+     Item.php
 Model/  <-- When using Joomla/Model
-    SubModel.php
+    ItemModel.php
+Providers/ <-- For own Service Providers
+	MyServiceProvider.php
 View/  <-- When using Joomla/View
-    SubHtmlView.php
+    ItemHtmlView.php
 templates/
-    alpha/
+    item/
         view.html.twig
         edit.html.twig
-	beta/
+	default/
 		view.xml.twig
-    default.html.twig
     layout.html.twig  <-- Only when component renders whole page
 config/
     doctrine/  <-- When using Doctrine/ORM
@@ -306,3 +333,21 @@ Concept base on
 - [Symfony2](https://github.com/symfony/symfony/) (Bundles)
 - [Joomla CMS](https://github.com/joomla/joomla-cms/) (Extensions)
 - [Joomla-Distro proposal](https://github.com/joomla-distro/) by [Júlio Pontes](https://github.com/juliopontes) (Installation)
+
+
+Resources
+---------
+- [composer/installers](https://github.com/composer/installers): Temporary solution to install extensions (as Joomla CMS ext.) in custom directory:
+
+```json
+{
+	"extra": {
+		"installer-paths": {
+			"Extensions/{$name}/: ["type:joomla-component", "type:joomla-plugin"]
+		}
+	}
+}
+```
+
+- [CackePHP packages](http://plugins.cakephp.org/packages/) - Same concept
+- [Packagyst](http://packalyst.com/)
