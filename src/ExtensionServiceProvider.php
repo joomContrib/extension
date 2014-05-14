@@ -67,7 +67,7 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 		// Process each extension
 		foreach ($this->loadData() as $alias => $entry)
 		{
-			$shortName = basename($entry->namespace);
+			$shortName = substr($entry->namespace, strrpos($entry->namespace, '\\') + 1);
 
 			// Get FQCN
 			if (!isset($entry->fqcn))
@@ -95,7 +95,7 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 					// Build an object
 					$className = $entry->fqcn;
 					$instance = new $className($c);
-					
+
 					// Note: may be false if cannot resolve FQCN
 					// Fatal error: Maximum function nesting level of '100' reached, aborting!
 				//	$instance = $c->buildObject($entry->fqcn, true);
@@ -241,7 +241,7 @@ class ExtensionServiceProvider implements ServiceProviderInterface
 		list($namespace, $controllerPath) = explode('\\Controller\\', get_class($controller));
 
 		// Build FQCN
-		$fqcn = '\\' . $namespace . '\\' . basename($namespace);
+		$fqcn = '\\' . $namespace . '\\' . substr($namespace, strrpos($namespace, '\\') + 1);
 
 		return $this->container->get($fqcn);
 	}
