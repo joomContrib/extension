@@ -343,7 +343,7 @@ Resources
 {
 	"extra": {
 		"installer-paths": {
-			"Extensions/{$name}/: ["type:joomla-component", "type:joomla-plugin"]
+			"Extensions/{$name}/": ["type:joomla-component", "type:joomla-plugin"]
 		}
 	}
 }
